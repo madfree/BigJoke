@@ -2,8 +2,8 @@ package com.madfree.displayjoke;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 
-import com.madfree.joketeller.JokeTeller;
 
 public class JokeActivity extends AppCompatActivity {
 
@@ -12,11 +12,11 @@ public class JokeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fetchJoke();
+        showJoke(getIntent().getStringExtra("jokeIntent"));
     }
 
-    public String fetchJoke() {
-        JokeTeller joke = new JokeTeller();
-        return joke.getJoke();
+    public void showJoke(String joke) {
+        Toast.makeText(this, joke, Toast.LENGTH_SHORT).show();
     }
+
 }
