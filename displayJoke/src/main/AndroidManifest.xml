@@ -3,7 +3,8 @@
     package="com.madfree.displayjoke">
 
     <application>
-        <activity android:name=".JokeActivity"></activity>
+        <activity
+            android:name=".JokeActivity" />
     </application>
 
 </manifest>
