@@ -13,6 +13,7 @@ import com.madfree.displayjoke.JokeActivity;
 import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class EndpointsAsyncTask extends AsyncTask <String, Void, String> {
 
@@ -55,11 +56,16 @@ public class EndpointsAsyncTask extends AsyncTask <String, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        Intent jokeIntent = new Intent(mContext, JokeActivity.class);
-        jokeIntent.putExtra(STRING_JOKE, result);
-        //startActivityForResult(jokeIntent, REQUEST_CODE_JOKE);
-        mContext.startActivity(jokeIntent);
+    protected void onProgressUpdate(Void... values) {
+        super.onProgressUpdate(values);
     }
+
+    //    @Override
+//    protected void onPostExecute(String result) {
+//        Intent jokeIntent = new Intent(mContext, JokeActivity.class);
+//        jokeIntent.putExtra(STRING_JOKE, result);
+//        //startActivityForResult(jokeIntent, REQUEST_CODE_JOKE);
+//        mContext.startActivity(jokeIntent);
+//    }
 
 }
