@@ -20,3 +20,31 @@ allprojects {
         jcenter()
     }
 }
+
+// First start an emulator, then run test with ./gradlew run_full_test
+task run_full_test {
+
+    task startCloudEndpoint(type: GradleBuild) {
+        tasks = ['appengineStart']
+    }
+
+    task stopCloudEndPoint(type: GradleBuild) {
+        tasks = ['appengineStop']
+    }
+
+    task startAndroidTest(type: GradleBuild) {
+        tasks = ['connectedAndroidTest']
+    }
+
+    doFirst {
+        startCloudEndpoint.execute()
+        println "Started local server!"
+        startAndroidTest.execute()
+        println "Ran all tests to success!"
+    }
+
+    doLast {
+        stopCloudEndPoint.execute()
+        println "Stopped local server!"
+    }
+}

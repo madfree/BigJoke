@@ -2,12 +2,15 @@ package com.udacity.gradle.builditbigger;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -26,6 +29,10 @@ import java.util.concurrent.ExecutionException;
 public class MainActivityFragment extends Fragment {
 
     private InterstitialAd mInterstitialAd;
+    private ProgressBar spinner;
+    private TextView hintTextView;
+    private Button jokeButton;
+
     private final String STRING_JOKE = "joke";
     private String joke;
 
@@ -34,53 +41,64 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_main, container, false);
 
-        MobileAds.initialize(getContext(), getString(R.string.interstitial_ad_unit_id));
-        mInterstitialAd = new InterstitialAd(this.getContext());
+        spinner = root.findViewById(R.id.progressBar);
+        spinner.setVisibility(View.GONE);
+        hintTextView = root.findViewById(R.id.instructions_text_view);
+        hintTextView.setVisibility(View.GONE);
+        jokeButton = root.findViewById(R.id.button_tell_joke);
+        jokeButton.setVisibility(View.GONE);
+
+//        MobileAds.initialize(getActivity(), getString(R.string.interstitial_ad_unit_id));
+        mInterstitialAd = new InterstitialAd(getActivity());
         mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
 
-        final Button jokeButton = root.findViewById(R.id.button_tell_joke);
-        jokeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mInterstitialAd.isLoaded()) {
-                    mInterstitialAd.show();
-                } else {
-                    Log.d("Ads", "The institialAd wasn't loaded jet");
-                }
-            }
-        });
-
         mInterstitialAd.setAdListener(new AdListener() {
-            Intent jokeIntent = new Intent(getContext(), JokeActivity.class);
             @Override
             public void onAdLoaded() {
-                Toast.makeText(getContext(), "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                // Code to be executed when an ad finishes loading.
+                Toast.makeText(getActivity(), "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                spinner.setVisibility(View.GONE);
+                hintTextView.setVisibility(View.VISIBLE);
+                jokeButton.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Toast.makeText(getContext(),
+                Toast.makeText(getActivity(),
                         "onAdFailedToLoad() with error code: " + errorCode,
                         Toast.LENGTH_LONG).show();
+                spinner.setVisibility(View.GONE);
+                hintTextView.setVisibility(View.VISIBLE);
+                jokeButton.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAdOpened() {
                 // Code to be executed when the ad is displayed.
-                joke = fetchJoke();
-                Toast.makeText(getContext(),
-                        "fetching joke",
+                Toast.makeText(getActivity(),
+                        "Displaying Ad",
                         Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onAdClosed() {
-                if (joke == null || joke.equals("")) {
-                    jokeIntent.putExtra(STRING_JOKE, "Sorry, no funny joke delivered :(");
-                } else {
-                    jokeIntent.putExtra(STRING_JOKE, joke);
+                displayJoke();
+            }
+        });
+
+        jokeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spinner.setVisibility(View.VISIBLE);
+                Log.d("Ads", "Starting spinner");
+                if (spinner.isShown()) {
+                    if (mInterstitialAd.isLoaded()) {
+                        mInterstitialAd.show();
+                    } else {
+                        Log.d("Ads", "The institialAd wasn't loaded jet");
+                        displayJoke();
+                    }
                 }
-                getContext().startActivity(jokeIntent);
             }
         });
         return root;
@@ -89,13 +107,28 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mInterstitialAd.loadAd(new AdRequest.Builder().build());
-        Log.d("Ads", "Loading ad in onResume");
+        spinner.setVisibility(View.VISIBLE);
+        if (!mInterstitialAd.isLoading() && !mInterstitialAd.isLoaded()) {
+            Log.d("Ads", "Starting spinner");
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mInterstitialAd.loadAd(adRequest);
+            Log.d("Ads", "Loading ad in onResume");
+        }
+        if (joke == null || joke.isEmpty()) {
+            joke = fetchJoke();
+            Log.d("Ads", "Fetching joke");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        spinner.setVisibility(View.GONE);
     }
 
     private String fetchJoke() {
         try {
-            String joke =  new EndpointsAsyncTask(getContext()).execute().get();
+            joke =  new EndpointsAsyncTask(getContext()).execute().get();
             return joke;
         } catch(InterruptedException e) {
             return e.getMessage();
@@ -104,4 +137,13 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    private void displayJoke() {
+            Intent jokeIntent = new Intent(getActivity(), JokeActivity.class);
+            if (joke == null || joke.equals("")) {
+                jokeIntent.putExtra(STRING_JOKE, "Sorry, no funny joke delivered :(");
+            } else {
+                jokeIntent.putExtra(STRING_JOKE, joke);
+            }
+            getActivity().startActivity(jokeIntent);
+        }
 }
