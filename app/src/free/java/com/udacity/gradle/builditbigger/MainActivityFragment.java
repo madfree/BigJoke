@@ -2,7 +2,7 @@ package com.udacity.gradle.builditbigger;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.madfree.displayjoke.JokeActivity;
@@ -32,6 +31,7 @@ public class MainActivityFragment extends Fragment {
     private ProgressBar spinner;
     private TextView hintTextView;
     private Button jokeButton;
+    private AdRequest adRequest;
 
     private final String STRING_JOKE = "joke";
     private String joke;
@@ -40,33 +40,47 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MobileAds.initialize(getActivity(),getString(R.string.admob_app_id));
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_main, container, false);
 
         spinner = root.findViewById(R.id.progressBar);
-        spinner.setVisibility(View.GONE);
+        spinner.setVisibility(View.VISIBLE);
+
         hintTextView = root.findViewById(R.id.instructions_text_view);
         hintTextView.setVisibility(View.GONE);
+
         jokeButton = root.findViewById(R.id.button_tell_joke);
         jokeButton.setVisibility(View.GONE);
 
-//        MobileAds.initialize(getActivity(), getString(R.string.interstitial_ad_unit_id));
-        mInterstitialAd = new InterstitialAd(getActivity());
+        adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mInterstitialAd = new InterstitialAd(getContext());
         mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
+        mInterstitialAd.loadAd(adRequest);
+        Log.d("Ads", "Loading ad in onCreateView");
 
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
-                Toast.makeText(getActivity(), "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "onAdLoaded()", Toast.LENGTH_SHORT).show();
                 spinner.setVisibility(View.GONE);
                 hintTextView.setVisibility(View.VISIBLE);
                 jokeButton.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Toast.makeText(getActivity(),
+                // Code to be executed when loading ad fails
+                Toast.makeText(getContext(),
                         "onAdFailedToLoad() with error code: " + errorCode,
                         Toast.LENGTH_LONG).show();
                 spinner.setVisibility(View.GONE);
@@ -76,12 +90,13 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onAdOpened() {
                 // Code to be executed when the ad is displayed.
-                Toast.makeText(getActivity(),
+                Toast.makeText(getContext(),
                         "Displaying Ad",
                         Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onAdClosed() {
+                // Code to be executed when ad is closed
                 displayJoke();
             }
         });
@@ -90,15 +105,12 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 spinner.setVisibility(View.VISIBLE);
-                Log.d("Ads", "Starting spinner");
-                if (spinner.isShown()) {
-                    if (mInterstitialAd.isLoaded()) {
-                        mInterstitialAd.show();
-                    } else {
-                        Log.d("Ads", "The institialAd wasn't loaded jet");
-                        displayJoke();
-                    }
-                }
+                hintTextView.setVisibility(View.GONE);
+                jokeButton.setVisibility(View.GONE);
+
+                joke = fetchJoke();
+                Log.d("Ads", "Fetching joke in setOnCLickListener");
+                showInterstitial();
             }
         });
         return root;
@@ -107,16 +119,13 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        hintTextView.setVisibility(View.GONE);
+        jokeButton.setVisibility(View.GONE);
         spinner.setVisibility(View.VISIBLE);
         if (!mInterstitialAd.isLoading() && !mInterstitialAd.isLoaded()) {
             Log.d("Ads", "Starting spinner");
-            AdRequest adRequest = new AdRequest.Builder().build();
             mInterstitialAd.loadAd(adRequest);
             Log.d("Ads", "Loading ad in onResume");
-        }
-        if (joke == null || joke.isEmpty()) {
-            joke = fetchJoke();
-            Log.d("Ads", "Fetching joke");
         }
     }
 
@@ -138,12 +147,23 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void displayJoke() {
-            Intent jokeIntent = new Intent(getActivity(), JokeActivity.class);
+            Intent jokeIntent = new Intent(getContext(), JokeActivity.class);
             if (joke == null || joke.equals("")) {
                 jokeIntent.putExtra(STRING_JOKE, "Sorry, no funny joke delivered :(");
             } else {
                 jokeIntent.putExtra(STRING_JOKE, joke);
             }
-            getActivity().startActivity(jokeIntent);
+            getContext().startActivity(jokeIntent);
+        }
+
+        private void showInterstitial() {
+            if (mInterstitialAd!= null && mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            } else {
+                Toast.makeText(getContext(), "Something went wrong with the ad", Toast.LENGTH_LONG).show();
+                displayJoke();
+            }
         }
 }
+
+
