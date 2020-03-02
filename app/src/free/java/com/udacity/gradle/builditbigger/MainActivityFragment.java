@@ -66,13 +66,12 @@ public class MainActivityFragment extends Fragment {
         mInterstitialAd = new InterstitialAd(getContext());
         mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
         mInterstitialAd.loadAd(adRequest);
-        Log.d("Ads", "Loading ad in onCreateView");
 
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
-                Toast.makeText(getContext(), "onAdLoaded()", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Ad was loaded", Toast.LENGTH_SHORT).show();
                 spinner.setVisibility(View.GONE);
                 hintTextView.setVisibility(View.VISIBLE);
                 jokeButton.setVisibility(View.VISIBLE);
@@ -109,7 +108,6 @@ public class MainActivityFragment extends Fragment {
                 jokeButton.setVisibility(View.GONE);
 
                 joke = fetchJoke();
-                Log.d("Ads", "Fetching joke in setOnCLickListener");
                 showInterstitial();
             }
         });
@@ -123,9 +121,7 @@ public class MainActivityFragment extends Fragment {
         jokeButton.setVisibility(View.GONE);
         spinner.setVisibility(View.VISIBLE);
         if (!mInterstitialAd.isLoading() && !mInterstitialAd.isLoaded()) {
-            Log.d("Ads", "Starting spinner");
             mInterstitialAd.loadAd(adRequest);
-            Log.d("Ads", "Loading ad in onResume");
         }
     }
 
@@ -139,9 +135,7 @@ public class MainActivityFragment extends Fragment {
         try {
             joke =  new EndpointsAsyncTask(getContext()).execute().get();
             return joke;
-        } catch(InterruptedException e) {
-            return e.getMessage();
-        } catch (ExecutionException e) {
+        } catch(InterruptedException | ExecutionException e) {
             return e.getMessage();
         }
     }

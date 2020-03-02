@@ -8,6 +8,6 @@
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
 
     <!--    TODO: Provide your Google Admob App ID here:-->
-    <string name="admob_app_id">####</string>
+    <string name="admob_app_id">###</string>
 
 </resources>
