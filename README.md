@@ -14,18 +14,16 @@ The app consists of four modules. A Java library that provides jokes, a Google C
 
 ### Showcase
 
-<img src=„/screenshots/BigJoke_prev.gif“>
-
-<img src="/screenshots/1.png“>
-<img src="/screenshots/2.png“>
-<img src="/screenshots/3.png“>
+<img src=/screenshots/BigJoke_prev.gif width="200">
 
 ## Getting started / Installation
 
 1. Download the zip-file with the code and import it into Android Studio OR clone the code with Android Studio
 2. To later see AdMob ads, ad your AdMob App Id in strings.xml
-3. Start the GCE with the gradle command appengineStart  <img src=„/screenshots/gradle_appengine_start.png“>
-4. Test the GCE by typing localhost:8080 into your browser. You should see the following in the browser tab.  <img src=„/screenshots/cloud_endpoint_local.png“>
+3. Start the GCE with the gradle command appengineStart 
+ <img src=/screenshots/gradle_appengine_start.png width="500">
+4. Test the GCE by typing localhost:8080 into your browser. You should see the following in the browser tab. 
+ <img src=/screenshots/cloud_endpoint_local.png width="500">
 5. In the Build Variante Tab choose the paid or the free build variant
 6. Start the Android emulator
 
