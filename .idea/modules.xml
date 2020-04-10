@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/FinalProject.iml" filepath="$PROJECT_DIR$/.idea/FinalProject.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/backend/backend.iml" filepath="$PROJECT_DIR$/backend/backend.iml" />
-      <module fileurl="file://$PROJECT_DIR$/displayJoke/displayJoke.iml" filepath="$PROJECT_DIR$/displayJoke/displayJoke.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jokeTeller/jokeTeller.iml" filepath="$PROJECT_DIR$/jokeTeller/jokeTeller.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FinalProject.iml" filepath="$PROJECT_DIR$/.idea/FinalProject.iml" group="FinalProject" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="FinalProject/app" />
+      <module fileurl="file://$PROJECT_DIR$/backend/backend.iml" filepath="$PROJECT_DIR$/backend/backend.iml" group="FinalProject/backend" />
+      <module fileurl="file://$PROJECT_DIR$/displayJoke/displayJoke.iml" filepath="$PROJECT_DIR$/displayJoke/displayJoke.iml" group="FinalProject/displayJoke" />
+      <module fileurl="file://$PROJECT_DIR$/jokeTeller/jokeTeller.iml" filepath="$PROJECT_DIR$/jokeTeller/jokeTeller.iml" group="FinalProject/jokeTeller" />
     </modules>
   </component>
 </project>
